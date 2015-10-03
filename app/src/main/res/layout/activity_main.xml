@@ -5,45 +5,61 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.elmanahil.rdown.MainActivity">
-    <Spinner
-        android:id="@+id/spinner1"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown" />
-    <EditText
-        android:text="* one\n* ~~two~~"
-        android:id="@+id/fullscreen_content_edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
-        android:text="translate"
-        android:id="@+id/fullscreen_content_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:text="TextView using Html.fromHtml helper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:text="raw HTML"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/fullscreen_content_raw"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:text="HtmlTextView widget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <com.elmanahil.rdown.HtmlTextView
-        android:id="@+id/html_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <Spinner
+                android:id="@+id/spinner1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown" />
+            <EditText
+                android:text="some|header|labels|more\n
+:---|:--:|---:|:--:\n
+Left|center|right|center\n
+a|b|c|j\n
+d|e|f|s"
+                android:id="@+id/fullscreen_content_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:text="translate"
+                android:id="@+id/fullscreen_content_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="TextView using Html.fromHtml helper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/fullscreen_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:text="raw HTML"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/fullscreen_content_raw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:text="HtmlTextView widget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <HorizontalScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <com.elmanahil.rdown.HtmlTextView
+                    android:id="@+id/html_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </HorizontalScrollView>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

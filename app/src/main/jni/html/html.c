@@ -542,65 +542,158 @@ rndr_raw_html(struct buf *ob, const struct buf *text, void *opaque)
     return 1;
 }
 
+/* - */
+struct table {
+	char cells[100][100];
+	int cellsSize;
+	int wordSize;
+	int rows;
+	int rowSize;
+} _;
+
+void
+init_table() {
+	_.rows = 0;
+	_.rowSize = 0;
+	_.wordSize = 0;
+	_.cellsSize = 0;
+}
+
 static void
 rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, void *opaque)
 {
+	_.rowSize = _.cellsSize / _.rows;
 	if (ob->size) bufputc(ob, '\n');
-	BUFPUTSL(ob, "<table><thead>\n");
-	if (header)
-		bufput(ob, header->data, header->size);
-	BUFPUTSL(ob, "</thead><tbody>\n");
-	if (body)
-		bufput(ob, body->data, body->size);
-	BUFPUTSL(ob, "</tbody></table>\n");
+	BUFPUTSL(ob, "<code>");
+
+	int i, x, z, y, rm, c = 0;
+
+	BUFPUTSL(ob, "╔");
+	for (i = 0; i < _.rowSize; i++) {
+		for (x = 0; x < _.wordSize; x++) {
+			BUFPUTSL(ob, "═");
+		}
+		if ((i + 1) == _.rowSize) break;
+		BUFPUTSL(ob, "╦");
+	}
+	BUFPUTSL(ob, "╗<br>\n");
+
+	for (i = 0; i < _.rows; i++) {
+		for (x = 0; x < _.rowSize; x++) {
+			BUFPUTSL(ob, "║");
+			bufputs(ob, _.cells[c]);
+
+			// calcute needed white space
+			rm = _.wordSize - strlen(_.cells[c]);
+			for (z = 0; z < (rm + 1); z++) {
+				BUFPUTSL(ob, "&nbsp;");
+			}
+			c++;
+		}
+		BUFPUTSL(ob, "║<br>\n");
+
+		if ((i + 1) < _.rows) {
+			BUFPUTSL(ob, "╠");
+			for (y = 0; y < _.rowSize; y++) {
+				for (x = 0; x < _.wordSize; x++) {
+					BUFPUTSL(ob, "═");
+				}
+				if ((y + 1) == _.rowSize) break;
+				BUFPUTSL(ob, "╬");
+			}
+			BUFPUTSL(ob, "╣<br>\n");
+		}
+	}
+
+
+	BUFPUTSL(ob, "╚");
+	for (i = 0; i < _.rowSize; i++) {
+		for (x = 0; x < _.wordSize; x++) {
+			BUFPUTSL(ob, "═");
+		}
+		if ((i + 1) == _.rowSize) break;
+		BUFPUTSL(ob, "╩");
+	}
+	BUFPUTSL(ob, "╝<br>\n");
+	BUFPUTSL(ob, "</code>\n");
+
+	init_table();
+}
+
+static void
+_rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, void *opaque)
+{
+	_.rowSize = _.cellsSize / _.rows;
+	if (ob->size) bufputc(ob, '\n');
+	BUFPUTSL(ob, "<pre><code>");
+
+	int i, x, z, y, rm, c = 0;
+
+	BUFPUTSL(ob, "┏");
+	for (i = 0; i < _.rowSize; i++) {
+		for (x = 0; x < _.wordSize; x++) {
+			BUFPUTSL(ob, "━");
+		}
+		if ((i + 1) == _.rowSize) break;
+		BUFPUTSL(ob, "┳");
+	}
+	BUFPUTSL(ob, "┓<br>\n");
+
+	for (i = 0; i < _.rows; i++) {
+		for (x = 0; x < _.rowSize; x++) {
+			BUFPUTSL(ob, "┃");
+			bufputs(ob, _.cells[c]);
+
+			// calcute needed white space
+			rm = _.wordSize - strlen(_.cells[c]);
+			for (z = 0; z < (rm + 1); z++) {
+				BUFPUTSL(ob, "&nbsp;");
+			}
+			c++;
+		}
+		BUFPUTSL(ob, "┃<br>\n");
+
+		if ((i + 1) < _.rows) {
+			BUFPUTSL(ob, "┣");
+			for (y = 0; y < _.rowSize; y++) {
+				for (x = 0; x < _.wordSize; x++) {
+					BUFPUTSL(ob, "━");
+				}
+				if ((y + 1) == _.rowSize) break;
+				BUFPUTSL(ob, "╂");
+			}
+			BUFPUTSL(ob, "┫<br>\n");
+		}
+	}
+
+
+	BUFPUTSL(ob, "┗");
+	for (i = 0; i < _.rowSize; i++) {
+		for (x = 0; x < _.wordSize; x++) {
+			BUFPUTSL(ob, "━");
+		}
+		if ((i + 1) == _.rowSize) break;
+		BUFPUTSL(ob, "┸");
+	}
+	BUFPUTSL(ob, "┛<br>\n");
+	BUFPUTSL(ob, "</code></pre>\n");
+
+	init_table();
 }
 
 static void
 rndr_tablerow(struct buf *ob, const struct buf *text, void *opaque)
 {
-	BUFPUTSL(ob, "<tr>\n");
-	if (text)
-		bufput(ob, text->data, text->size);
-	BUFPUTSL(ob, "</tr>\n");
+	_.rows++;
 }
 
 static void
 rndr_tablecell(struct buf *ob, const struct buf *text, int flags, void *opaque, int col_span)
 {
-	if (flags & MKD_TABLE_HEADER) {
-		BUFPUTSL(ob, "<th");
-	} else {
-		BUFPUTSL(ob, "<td");
-	}
-
-	if (col_span > 1) {
-		bufprintf(ob, " colspan=\"%d\" ", col_span);
-	}
-
-	switch (flags & MKD_TABLE_ALIGNMASK) {
-	case MKD_TABLE_ALIGN_CENTER:
-		BUFPUTSL(ob, " align=\"center\">");
-		break;
-
-	case MKD_TABLE_ALIGN_L:
-		BUFPUTSL(ob, " align=\"left\">");
-		break;
-
-	case MKD_TABLE_ALIGN_R:
-		BUFPUTSL(ob, " align=\"right\">");
-		break;
-
-	default:
-		BUFPUTSL(ob, ">");
-	}
-
-	if (text)
-		bufput(ob, text->data, text->size);
-
-	if (flags & MKD_TABLE_HEADER) {
-		BUFPUTSL(ob, "</th>\n");
-	} else {
-		BUFPUTSL(ob, "</td>\n");
+	if (text) {
+		if (_.wordSize < text->size) _.wordSize = (int) text->size;
+		strcpy(_.cells[_.cellsSize], bufcstr(text));
+		_.cellsSize++;
 	}
 }
 

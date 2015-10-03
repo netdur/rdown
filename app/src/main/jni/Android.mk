@@ -16,5 +16,6 @@ LOCAL_SRC_FILES := \
 
 
 LOCAL_C_INCLUDES := jni/src
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
 
 include $(BUILD_SHARED_LIBRARY)
