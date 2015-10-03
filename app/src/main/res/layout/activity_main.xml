@@ -12,18 +12,14 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <Spinner
-                android:id="@+id/spinner1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown" />
             <EditText
                 android:text="some|header|labels|more\n
 :---|:--:|---:|:--:\n
 Left|center|right|center\n
 a|b|c|j\n
-d|e|f|s"
+d|e|f|s\n
+* item 1\n
+* ~~item 2~~"
                 android:id="@+id/fullscreen_content_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -40,14 +36,10 @@ d|e|f|s"
                 android:id="@+id/fullscreen_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <TextView
-                android:text="raw HTML"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/fullscreen_content_raw"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#ffffff"/>
             <TextView
                 android:text="HtmlTextView widget"
                 android:layout_width="match_parent"

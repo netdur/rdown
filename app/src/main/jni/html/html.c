@@ -581,6 +581,7 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 	for (i = 0; i < _.rows; i++) {
 		for (x = 0; x < _.rowSize; x++) {
 			BUFPUTSL(ob, "║");
+			if (i == 0) BUFPUTSL(ob, "<strong>");
 			bufputs(ob, _.cells[c]);
 
 			// calcute needed white space
@@ -588,6 +589,7 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 			for (z = 0; z < (rm + 1); z++) {
 				BUFPUTSL(ob, "&nbsp;");
 			}
+			if (i == 0) BUFPUTSL(ob, "</strong>");
 			c++;
 		}
 		BUFPUTSL(ob, "║<br>\n");
