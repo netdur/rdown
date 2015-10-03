@@ -621,67 +621,6 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 }
 
 static void
-_rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, void *opaque)
-{
-	_.rowSize = _.cellsSize / _.rows;
-	if (ob->size) bufputc(ob, '\n');
-	BUFPUTSL(ob, "<pre><code>");
-
-	int i, x, z, y, rm, c = 0;
-
-	BUFPUTSL(ob, "┏");
-	for (i = 0; i < _.rowSize; i++) {
-		for (x = 0; x < _.wordSize; x++) {
-			BUFPUTSL(ob, "━");
-		}
-		if ((i + 1) == _.rowSize) break;
-		BUFPUTSL(ob, "┳");
-	}
-	BUFPUTSL(ob, "┓<br>\n");
-
-	for (i = 0; i < _.rows; i++) {
-		for (x = 0; x < _.rowSize; x++) {
-			BUFPUTSL(ob, "┃");
-			bufputs(ob, _.cells[c]);
-
-			// calcute needed white space
-			rm = _.wordSize - strlen(_.cells[c]);
-			for (z = 0; z < (rm + 1); z++) {
-				BUFPUTSL(ob, "&nbsp;");
-			}
-			c++;
-		}
-		BUFPUTSL(ob, "┃<br>\n");
-
-		if ((i + 1) < _.rows) {
-			BUFPUTSL(ob, "┣");
-			for (y = 0; y < _.rowSize; y++) {
-				for (x = 0; x < _.wordSize; x++) {
-					BUFPUTSL(ob, "━");
-				}
-				if ((y + 1) == _.rowSize) break;
-				BUFPUTSL(ob, "╂");
-			}
-			BUFPUTSL(ob, "┫<br>\n");
-		}
-	}
-
-
-	BUFPUTSL(ob, "┗");
-	for (i = 0; i < _.rowSize; i++) {
-		for (x = 0; x < _.wordSize; x++) {
-			BUFPUTSL(ob, "━");
-		}
-		if ((i + 1) == _.rowSize) break;
-		BUFPUTSL(ob, "┸");
-	}
-	BUFPUTSL(ob, "┛<br>\n");
-	BUFPUTSL(ob, "</code></pre>\n");
-
-	init_table();
-}
-
-static void
 rndr_tablerow(struct buf *ob, const struct buf *text, void *opaque)
 {
 	_.rows++;
