@@ -13,9 +13,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <EditText
-                android:text="some|header|labels|more\n
+                android:text="y|header|labels|more\n
 :---|:--:|---:|:--:\n
-Left|center|right|center\n
+x|center|right|center\n
 a|b|c|j\n
 d|e|f|s\n
 * item 1\n

@@ -116,7 +116,7 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
         }
 
         // this uses Android's Html class for basic parsing, and HtmlTagHandler
-        setText(Html.fromHtml(html, htmlImgageGetter, new HtmlTagHandler()));
+        setText(Html.fromHtml(html, htmlImgageGetter, new HtmlTagHandler(getContext())));
 
         // make links work
         setMovementMethod(LocalLinkMovementMethod.getInstance());

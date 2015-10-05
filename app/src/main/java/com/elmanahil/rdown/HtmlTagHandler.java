@@ -20,6 +20,8 @@
 package com.elmanahil.rdown;
 
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Layout;
@@ -29,7 +31,6 @@ import android.text.style.AlignmentSpan;
 import android.text.style.BulletSpan;
 import android.text.style.LeadingMarginSpan;
 import android.text.style.StrikethroughSpan;
-import android.text.style.TypefaceSpan;
 import android.util.Log;
 
 import org.xml.sax.XMLReader;
@@ -70,6 +71,12 @@ public class HtmlTagHandler implements Html.TagHandler {
     }
 
     private static class Strike {
+    }
+
+    Context that;
+    HtmlTagHandler(Context that) {
+        super();
+        this.that = that;
     }
 
     @Override
@@ -146,7 +153,10 @@ public class HtmlTagHandler implements Html.TagHandler {
                     end(output, Ol.class, false, new LeadingMarginSpan.Standard(numberMargin));
                 }
             } else if (tag.equalsIgnoreCase("code")) {
-                end(output, Code.class, false, new TypefaceSpan("monospace"));
+                Typeface tf = Typeface.createFromAsset(that.getAssets(), "fonts/LiberationMono-Regular.ttf");
+                CustomTypefaceSpan ctfs = new CustomTypefaceSpan("", tf);
+                end(output, Code.class, false, ctfs);
+                // end(output, Code.class, false, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("center")) {
                 end(output, Center.class, true, new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER));
             } else if (tag.equalsIgnoreCase("s") || tag.equalsIgnoreCase("strike")) {

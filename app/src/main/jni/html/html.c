@@ -544,11 +544,12 @@ rndr_raw_html(struct buf *ob, const struct buf *text, void *opaque)
 
 /* - */
 struct table {
-	char cells[100][100];
-	int cellsSize;
-	int wordSize;
-	int rows;
-	int rowSize;
+	char cells[100][100]; // all of cells
+	int colSize[100]; // biggest cell in column
+	int cellsSize; // number of cells
+	int wordSize; // largest cell
+	int rows; // number of rows
+	int rowSize; // number of cells in a row
 } _;
 
 void
@@ -559,6 +560,17 @@ init_table() {
 	_.cellsSize = 0;
 }
 
+int getColSize(int pos) {
+	int i, cellLen, len;
+	for (i = pos; i < _.cellsSize; i = i + _.rowSize) {
+		cellLen = strlen(_.cells[i]);
+		if (len < cellLen) {
+			len = cellLen;
+		}
+	}
+	return len;
+}
+
 static void
 rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, void *opaque)
 {
@@ -566,11 +578,12 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 	if (ob->size) bufputc(ob, '\n');
 	BUFPUTSL(ob, "<code>");
 
-	int i, x, z, y, rm, c = 0;
+	int i, x, z, y, rm, c = 0, colSize;
 
 	BUFPUTSL(ob, "╔");
 	for (i = 0; i < _.rowSize; i++) {
-		for (x = 0; x < _.wordSize; x++) {
+		colSize = getColSize(i);
+		for (x = 0; x < colSize; x++) {
 			BUFPUTSL(ob, "═");
 		}
 		if ((i + 1) == _.rowSize) break;
@@ -579,14 +592,16 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 	BUFPUTSL(ob, "╗<br>\n");
 
 	for (i = 0; i < _.rows; i++) {
+		// row with content
 		for (x = 0; x < _.rowSize; x++) {
+			colSize = getColSize(x);
 			BUFPUTSL(ob, "║");
 			if (i == 0) BUFPUTSL(ob, "<strong>");
 			bufputs(ob, _.cells[c]);
 
 			// calcute needed white space
-			rm = _.wordSize - strlen(_.cells[c]);
-			for (z = 0; z < (rm + 1); z++) {
+			rm = colSize - strlen(_.cells[c]);
+			for (z = 0; z < rm; z++) {
 				BUFPUTSL(ob, "&nbsp;");
 			}
 			if (i == 0) BUFPUTSL(ob, "</strong>");
@@ -594,10 +609,12 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 		}
 		BUFPUTSL(ob, "║<br>\n");
 
+		// seperated row
 		if ((i + 1) < _.rows) {
 			BUFPUTSL(ob, "╠");
 			for (y = 0; y < _.rowSize; y++) {
-				for (x = 0; x < _.wordSize; x++) {
+				colSize = getColSize(y);
+				for (x = 0; x < colSize; x++) {
 					BUFPUTSL(ob, "═");
 				}
 				if ((y + 1) == _.rowSize) break;
@@ -610,7 +627,8 @@ rndr_table(struct buf *ob, const struct buf *header, const struct buf *body, voi
 
 	BUFPUTSL(ob, "╚");
 	for (i = 0; i < _.rowSize; i++) {
-		for (x = 0; x < _.wordSize; x++) {
+		colSize = getColSize(i);
+		for (x = 0; x < colSize; x++) {
 			BUFPUTSL(ob, "═");
 		}
 		if ((i + 1) == _.rowSize) break;
@@ -634,6 +652,7 @@ rndr_tablecell(struct buf *ob, const struct buf *text, int flags, void *opaque, 
 	if (text) {
 		if (_.wordSize < text->size) _.wordSize = (int) text->size;
 		strcpy(_.cells[_.cellsSize], bufcstr(text));
+		_.colSize[_.cellsSize] = (int) text->size;
 		_.cellsSize++;
 	}
 }
