@@ -16,20 +16,22 @@
 
 package com.elmanahil.rdown;
 
+import android.content.ActivityNotFoundException;
 import android.text.Layout;
-import android.text.Selection;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
-import android.text.method.Touch;
 import android.text.style.ClickableSpan;
+import android.text.style.URLSpan;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-/**
- * Copied from http://stackoverflow.com/questions/8558732
- */
 public class LocalLinkMovementMethod extends LinkMovementMethod {
     static LocalLinkMovementMethod sInstance;
+
+    private HtmlTextView.OnLinkClickedListener clickListener;
+    public void setLinkClickedListener(HtmlTextView.OnLinkClickedListener ev) {
+        this.clickListener = ev;
+    }
 
     public static LocalLinkMovementMethod getInstance() {
         if (sInstance == null)
@@ -40,10 +42,10 @@ public class LocalLinkMovementMethod extends LinkMovementMethod {
 
     @Override
     public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+
         int action = event.getAction();
 
-        if (action == MotionEvent.ACTION_UP ||
-                action == MotionEvent.ACTION_DOWN) {
+        if (action == MotionEvent.ACTION_UP) {
             int x = (int) event.getX();
             int y = (int) event.getY();
 
@@ -56,28 +58,18 @@ public class LocalLinkMovementMethod extends LinkMovementMethod {
             Layout layout = widget.getLayout();
             int line = layout.getLineForVertical(y);
             int off = layout.getOffsetForHorizontal(line, x);
+            float maxLineRight = layout.getLineWidth(line);
 
             ClickableSpan[] link = buffer.getSpans(off, off, ClickableSpan.class);
 
-            if (link.length != 0) {
-                if (action == MotionEvent.ACTION_UP) {
-                    link[0].onClick(widget);
-                } else if (action == MotionEvent.ACTION_DOWN) {
-                    Selection.setSelection(buffer,
-                            buffer.getSpanStart(link[0]),
-                            buffer.getSpanEnd(link[0]));
-                }
-
-                if (widget instanceof HtmlTextView) {
-                    ((HtmlTextView) widget).mLinkHit = true;
-                }
-                return true;
-            } else {
-                Selection.removeSelection(buffer);
-                Touch.onTouchEvent(widget, buffer, event);
+            if (link.length == 0) return false;
+            try {
+                clickListener.onClick(((URLSpan) link[0]).getURL());
                 return false;
+            } catch (ActivityNotFoundException ex) {
+                return true;
             }
         }
-        return Touch.onTouchEvent(widget, buffer, event);
+        return true;
     }
 }

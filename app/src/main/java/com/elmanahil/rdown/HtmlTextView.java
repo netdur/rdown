@@ -20,7 +20,6 @@ import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -31,6 +30,15 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
     public static final boolean DEBUG = false;
     boolean mDontConsumeNonUrlClicks = true;
     boolean mLinkHit;
+
+    public interface OnLinkClickedListener {
+        void onClick(String url);
+    }
+    private HtmlTextView.OnLinkClickedListener clickListener;
+    public void setLinkClickedListener(HtmlTextView.OnLinkClickedListener ev) {
+        this.clickListener = ev;
+        LocalLinkMovementMethod.getInstance().setLinkClickedListener(ev);
+    }
 
     public HtmlTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -44,18 +52,14 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
         super(context);
     }
 
-    public interface ImageGetter {
-    }
+    public interface ImageGetter {}
 
-    public static class LocalImageGetter implements ImageGetter {
-    }
+    public static class LocalImageGetter implements ImageGetter {}
 
     public static class RemoteImageGetter implements ImageGetter {
         public String baseUrl;
-
         public RemoteImageGetter() {
         }
-
         public RemoteImageGetter(String baseUrl) {
             this.baseUrl = baseUrl;
         }
@@ -69,6 +73,7 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
         return s.hasNext() ? s.next() : "";
     }
 
+    /*
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mLinkHit = false;
@@ -79,6 +84,7 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
         }
         return res;
     }
+    */
 
     /**
      * Loads HTML from a raw resource, i.e., a HTML file in res/raw/.
@@ -120,31 +126,5 @@ public class HtmlTextView extends JellyBeanSpanFixTextView {
 
         // make links work
         setMovementMethod(LocalLinkMovementMethod.getInstance());
-
-        // no flickering when clicking textview for Android < 4, but overriders color...
-//        text.setTextColor(getResources().getColor(android.R.color.secondary_text_dark_nodisable));
     }
-
-    /**
-     * @deprecated
-     */
-    public void setHtmlFromRawResource(Context context, int resId, boolean useLocalDrawables) {
-        if (useLocalDrawables) {
-            setHtmlFromRawResource(context, resId, new LocalImageGetter());
-        } else {
-            setHtmlFromRawResource(context, resId, new RemoteImageGetter());
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public void setHtmlFromString(String html, boolean useLocalDrawables) {
-        if (useLocalDrawables) {
-            setHtmlFromString(html, new LocalImageGetter());
-        } else {
-            setHtmlFromString(html, new RemoteImageGetter());
-        }
-    }
-
 }

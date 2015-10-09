@@ -21,6 +21,12 @@ public class MainActivity extends Activity {
 
         tv = (TextView) findViewById(R.id.fullscreen_content);
         htv = (HtmlTextView) findViewById(R.id.html_text);
+        htv.setLinkClickedListener(new HtmlTextView.OnLinkClickedListener() {
+            @Override
+            public void onClick(String url) {
+                Log.i("clicked", url);
+            }
+        });
 
         final EditText et = (EditText) findViewById(R.id.fullscreen_content_edit);
         Button btn = (Button) findViewById(R.id.fullscreen_content_btn);

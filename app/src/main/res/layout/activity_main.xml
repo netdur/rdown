@@ -18,6 +18,11 @@
 x|center|right|center\n
 a|b|c|j\n
 d|e|f|s\n
+
+\n
+[bestof](r/bestof)
+\n
+
 * item 1\n
 * ~~item 2~~"
                 android:id="@+id/fullscreen_content_edit"
@@ -48,6 +53,7 @@ d|e|f|s\n
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
                 <com.elmanahil.rdown.HtmlTextView
+                    android:textIsSelectable="true"
                     android:id="@+id/html_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
